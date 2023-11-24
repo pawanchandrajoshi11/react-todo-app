@@ -1,9 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./css/App.css";
 
 function App() {
   const [newItem, setNewItem] = useState("");
-  const [todos, setTodos] = useState([]);
+  const [todos, setTodos] = useState(() => {
+    const localValue = localStorage.getItem("ITEMS")
+    if(localValue == null) return [];
+  
+  return JSON.parse(localValue);
+  });
+
+  useEffect(() => {
+    localStorage.setItem("ITEMS", JSON.stringify(todos));
+  }, [todos])
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -21,7 +31,9 @@ function App() {
     setTodos((currentTodos) => {
       return currentTodos.map((todo) => {
         if (todo.id === id) {
-          return [...todo, completed];
+          return { ...todo, completed };
+        } else {
+          return todo;
         }
       });
     });
